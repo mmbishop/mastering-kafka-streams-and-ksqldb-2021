@@ -9,10 +9,10 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<name>videogame-leader-board</name>
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<avro.version>1.11.0</avro.version>
-		<kafka.version>2.7.2</kafka.version>
+		<kafka.version>3.2.0</kafka.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>io.javalin</groupId>
 			<artifactId>javalin</artifactId>
-			<version>3.13.13</version>
+			<version>4.6.0</version>
 
 		</dependency>
 		<dependency>

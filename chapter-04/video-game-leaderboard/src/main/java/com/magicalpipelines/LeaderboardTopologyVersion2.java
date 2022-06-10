@@ -47,10 +47,8 @@ class LeaderboardTopologyVersion2 {
         Joined.with(Serdes.String(), JsonSerdes.ScoreEvent(), JsonSerdes.Player());
 
     // join scoreEvents -> players
-    ValueJoiner<ScoreEvent, Player, ScoreWithPlayer> scorePlayerJoiner =
-        (score, player) -> new ScoreWithPlayer(score, player);
-    KStream<String, ScoreWithPlayer> withPlayers =
-        scoreEvents.join(players, scorePlayerJoiner, playerJoinParams);
+    ValueJoiner<ScoreEvent, Player, ScoreWithPlayer> scorePlayerJoiner = ScoreWithPlayer::new;
+    KStream<String, ScoreWithPlayer> withPlayers = scoreEvents.join(players, scorePlayerJoiner, playerJoinParams);
 
     /**
      * map score-with-player records to products
@@ -60,17 +58,14 @@ class LeaderboardTopologyVersion2 {
      * key type
      */
     KeyValueMapper<String, ScoreWithPlayer, String> keyMapper =
-        (leftKey, scoreWithPlayer) -> {
-          return String.valueOf(scoreWithPlayer.getScoreEvent().getProductId());
-        };
+        (leftKey, scoreWithPlayer) -> String.valueOf(scoreWithPlayer.getScoreEvent().getProductId());
 
     // join the withPlayers stream to the product global ktable
-    ValueJoiner<ScoreWithPlayer, Product, Enriched> productJoiner =
-        (scoreWithPlayer, product) -> new Enriched(scoreWithPlayer, product);
+    ValueJoiner<ScoreWithPlayer, Product, Enriched> productJoiner = Enriched::new;
     KStream<String, Enriched> withProducts = withPlayers.join(products, keyMapper, productJoiner);
     withProducts.print(Printed.<String, Enriched>toSysOut().withLabel("with-products"));
 
-    /** Group the enriched product stream */
+    /* Group the enriched product stream */
     KGroupedStream<String, Enriched> grouped =
         withProducts.groupBy(
             (key, value) -> value.getProductId().toString(),
@@ -78,14 +73,14 @@ class LeaderboardTopologyVersion2 {
     // alternatively, use the following if you want to name the grouped repartition topic:
     // Grouped.with("grouped-enriched", Serdes.String(), JsonSerdes.Enriched()))
 
-    /** The initial value of our aggregation will be a new HighScores instances */
+    /* The initial value of our aggregation will be a new HighScores instances */
     Initializer<HighScores> highScoresInitializer = HighScores::new;
 
-    /** The logic for aggregating high scores is implemented in the HighScores.add method */
+    /* The logic for aggregating high scores is implemented in the HighScores.add method */
     Aggregator<String, Enriched, HighScores> highScoresAdder =
         (key, value, aggregate) -> aggregate.add(value);
 
-    /** Perform the aggregation, and materialize the underlying state store for querying */
+    /* Perform the aggregation, and materialize the underlying state store for querying */
     KTable<String, HighScores> highScores =
         grouped.aggregate(highScoresInitializer, highScoresAdder);
 

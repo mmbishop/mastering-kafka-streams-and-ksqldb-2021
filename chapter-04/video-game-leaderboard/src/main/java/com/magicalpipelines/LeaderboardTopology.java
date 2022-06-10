@@ -51,8 +51,7 @@ class LeaderboardTopology {
         Joined.with(Serdes.String(), JsonSerdes.ScoreEvent(), JsonSerdes.Player());
 
     // join scoreEvents -> players
-    ValueJoiner<ScoreEvent, Player, ScoreWithPlayer> scorePlayerJoiner =
-        (score, player) -> new ScoreWithPlayer(score, player);
+    ValueJoiner<ScoreEvent, Player, ScoreWithPlayer> scorePlayerJoiner = ScoreWithPlayer::new;
     KStream<String, ScoreWithPlayer> withPlayers =
         scoreEvents.join(players, scorePlayerJoiner, playerJoinParams);
 
@@ -69,8 +68,7 @@ class LeaderboardTopology {
         };
 
     // join the withPlayers stream to the product global ktable
-    ValueJoiner<ScoreWithPlayer, Product, Enriched> productJoiner =
-        (scoreWithPlayer, product) -> new Enriched(scoreWithPlayer, product);
+    ValueJoiner<ScoreWithPlayer, Product, Enriched> productJoiner = Enriched::new;
     KStream<String, Enriched> withProducts = withPlayers.join(products, keyMapper, productJoiner);
     withProducts.print(Printed.<String, Enriched>toSysOut().withLabel("with-products"));
 

@@ -55,10 +55,10 @@ class LeaderboardService {
     app.get("/leaderboard/count/local", this::getCountLocal);
 
     /** Local key-value store query: range scan (inclusive) */
-    app.get("/leaderboard/:from/:to", this::getRange);
+    app.get("/leaderboard/{from}/{to}", this::getRange);
 
     /** Local key-value store query: point-lookup / single-key lookup */
-    app.get("/leaderboard/:key", this::getKey);
+    app.get("/leaderboard/{key}", this::getKey);
   }
 
   void getAll(Context ctx) {
