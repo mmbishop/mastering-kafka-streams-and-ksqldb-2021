@@ -30,7 +30,7 @@ class DslExample {
     // set the required properties for running Kafka Streams
     Properties config = new Properties();
     config.put(StreamsConfig.APPLICATION_ID_CONFIG, "dev1");
-    config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+    config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
     config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
     config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.Void().getClass());
     config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
