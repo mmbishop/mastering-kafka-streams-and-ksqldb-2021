@@ -54,8 +54,7 @@ class PatientMonitoringTopology {
         builder.stream("body-temp-events", bodyTempConsumerOptions);
 
     // turn pulse into a rate (bpm)
-    TimeWindows tumblingWindow =
-        TimeWindows.of(Duration.ofSeconds(60)).grace(Duration.ofSeconds(5));
+    TimeWindows tumblingWindow = TimeWindows.ofSizeAndGrace(Duration.ofSeconds(60), Duration.ofSeconds(5));
 
     /*!
      * Examples of other windows (not needed for the tutorial) are commented
@@ -121,11 +120,7 @@ class PatientMonitoringTopology {
         StreamJoined.with(Serdes.String(), Serdes.Long(), JsonSerdes.BodyTemp());
 
     JoinWindows joinWindows =
-        JoinWindows
-            // timestamps must be 1 minute apart
-            .of(Duration.ofSeconds(60))
-            // tolerate late arriving data for up to 10 seconds
-            .grace(Duration.ofSeconds(10));
+        JoinWindows.ofTimeDifferenceAndGrace(Duration.ofSeconds(60), Duration.ofSeconds(10));
 
     ValueJoiner<Long, BodyTemp, CombinedVitals> valueJoiner =
         (pulseRate, bodyTemp) -> new CombinedVitals(pulseRate.intValue(), bodyTemp);

@@ -49,9 +49,9 @@ class RestService {
     /** Local window store query: all entries */
     app.get("/bpm/all", this::getAll);
 
-    app.get("/bpm/range/:from/:to", this::getAllInRange);
+    app.get("/bpm/range/{from}/{to}", this::getAllInRange);
 
-    app.get("/bpm/range/:key/:from/:to", this::getRange);
+    app.get("/bpm/range/{key}/{from}/{to}", this::getRange);
   }
 
   void getAll(Context ctx) {
